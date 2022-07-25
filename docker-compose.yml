@@ -10,6 +10,11 @@ services:
       NODE_ENV: development
       HTTP_PORT: 3000
       DEBUG_PORT: 3001
+      PGUSER: teresalves 
+      PGHOST: mydb 
+      PGDATABASE: pipedriveDb 
+      PGPASSWORD: example 
+      PGPORT: 5432 
     restart: unless-stopped
     volumes:
       - .:/app/
@@ -26,15 +31,10 @@ services:
       - 3300:5432
     volumes:
       - ~/dbdata:/var/lib/postgresql/data
-    
-
-  adminer:
-    image: adminer
-    restart: always
-    ports:
-      - 8081:8080
-    depends_on:
-      - mydb
+      - ./init-database.sh:/docker-entrypoint-initdb.d/init-database.sh
+    networks:
+      - pipedrive
+  
 
 networks:
   pipedrive:
