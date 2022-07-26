@@ -14,18 +14,18 @@ async function recursiveOrganisationProcess(
   baseOrg: OrganisationsBody,
   parents: Array<string>,
 ): Promise<void> {
-  parents.push(baseOrg.org_name);
+  const name = (baseOrg.org_name);
+  parents.push(name);
   await client.query(
     'INSERT INTO organisations(org_name) VALUES ($1) ON CONFLICT DO NOTHING;',
-    [baseOrg.org_name],
+    [name],
   );
   baseOrg.daughters?.forEach(async (daughter) => {
     if (!(daughter.org_name in parents)) {
-      // Avoid infinite loops
       await recursiveOrganisationProcess(daughter, parents); // had to wait because we cant add the relationship before the actual daughter
       await client.query(
         'INSERT INTO organisations_relations(parent, daughter) VALUES ($1,$2) ON CONFLICT DO NOTHING;',
-        [baseOrg.org_name, daughter.org_name],
+        [name, (daughter.org_name)],
       );
     }
   });
