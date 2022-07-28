@@ -1,8 +1,8 @@
 import Koa from 'koa';
 import Router from 'koa-router';
-import { processOrganizations } from './endpoints/organizations';
+import { OrganisationInsertor } from './endpoints/organizations';
 import bodyParser from 'koa-bodyparser';
-import { client, connectToPg } from './postgres-setup';
+import { pool } from './postgres-setup';
 import { getOrganisation } from './endpoints/get-organisation';
 
 export const app = new Koa();
@@ -10,15 +10,19 @@ export const app = new Koa();
 const router = new Router();
 app.use(bodyParser());
 app.use(router.routes());
-connectToPg();
 
 router.get('/', async (ctx) => {
+  const client = await pool.connect();
   const result = await client.query('SELECT * FROM organisations');
   ctx.body = result.rows;
+  client.release();
 });
 
-router.post('/organisations', (ctx) => {
-  processOrganizations(ctx);
+router.post('/organisations', async (ctx) => {
+  const organisationInsertor = new OrganisationInsertor();
+  const result = await organisationInsertor.processOrganizations(ctx);
+  ctx.body = result.msg;
+  ctx.status = result.status;
 });
 
 router.get('/organisations/:orgName', async (ctx) => {

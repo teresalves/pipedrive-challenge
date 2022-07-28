@@ -1,4 +1,4 @@
-import { Client } from 'pg';
+import { Pool } from 'pg';
 
 const clientConfig = {
   host: process.env.PGHOST || 'localhost',
@@ -8,12 +8,4 @@ const clientConfig = {
   database: process.env.PGDATABASE || 'pipedriveDb',
 };
 
-export const client = new Client(clientConfig);
-
-export function connectToPg() {
-  client.connect().catch((error: any) => {
-    // console.log('error connecting')
-    // console.log(error);
-    throw error;
-  });
-}
+export const pool = new Pool(clientConfig);

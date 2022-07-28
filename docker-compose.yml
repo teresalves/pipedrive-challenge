@@ -13,13 +13,15 @@ services:
       PGUSER: teresalves 
       PGHOST: mydb 
       PGDATABASE: pipedriveDb 
-      PGPASSWORD: example 
+      PGPASSWORD: example
       PGPORT: 5432 
     restart: unless-stopped
     volumes:
       - .:/app/
     networks:
       - pipedrive
+    depends_on:
+      - mydb
   mydb:
     container_name: "psql"
     image: postgres
