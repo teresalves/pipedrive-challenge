@@ -5,5 +5,5 @@ export type OrganisationsBody = {
 
 export type Result = {
   status: number;
-  msg: string;
+  msg: string | any[];
 };
