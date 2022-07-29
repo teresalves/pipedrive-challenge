@@ -21,12 +21,12 @@ router.get('/', async (ctx) => {
 router.post('/organisations', async (ctx) => {
   const organisationInsertor = new OrganisationInsertor();
   const result = await organisationInsertor.processOrganizations(ctx);
-  ctx.body = result.msg;
   ctx.status = result.status;
+  ctx.body = result.msg;
 });
 
 router.get('/organisations/:orgName', async (ctx) => {
   const result = await getOrganisation(ctx);
-  ctx.body = result.body;
   ctx.status = result.status;
+  ctx.body = result.body;
 });

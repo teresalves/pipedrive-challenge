@@ -8,7 +8,6 @@ export async function getOrganisation(ctx: ParameterizedContext) {
     'SELECT org_name FROM organisations WHERE org_name=$1;',
     [name],
   );
-
   if (existanceCheck.rows?.length === 0) {
     return { body: 'Organisation does not exist', status: 404 };
   }
@@ -25,7 +24,7 @@ export async function getOrganisation(ctx: ParameterizedContext) {
   client.release();
 
   if (result.rows?.length === 0) {
-    return { body: '', status: 204 };
+    return { body: undefined, status: 204 };
   }
   return { body: result.rows, status: 200 };
 }
