@@ -6,7 +6,6 @@ export class OrganisationInsertor {
   operationSuccess: boolean;
   errorMessage: string;
   result: Result;
-  client;
 
   constructor() {
     this.operationSuccess = true;
@@ -16,20 +15,18 @@ export class OrganisationInsertor {
   async processOrganizations(ctx: ParameterizedContext): Promise<Result> {
     const org: OrganisationsBody = ctx.request.body;
 
-    const result = await this.recursiveOrganisationProcess(org, []);
+    const result = await this.recursiveOrganisationProcess(org);
     return result;
   }
 
   async recursiveOrganisationProcess(
     baseOrg: OrganisationsBody,
-    parents: Array<string>,
   ): Promise<Result> {
     if (!this.operationSuccess) return;
 
     const client = await pool.connect();
     const result = { status: 200, msg: 'OK' };
     const name = baseOrg.org_name;
-    parents.push(name);
 
     await client.query(
       'INSERT INTO organisations(org_name) VALUES ($1) ON CONFLICT DO NOTHING;',
@@ -37,7 +34,7 @@ export class OrganisationInsertor {
     );
     if (baseOrg.daughters) {
       for (const daughter of Object.values(baseOrg.daughters)) {
-        await this.recursiveOrganisationProcess(daughter, parents);
+        await this.recursiveOrganisationProcess(daughter);
         try {
           await client.query(
             'INSERT INTO organisations_relations(parent, daughter) VALUES ($1,$2);',
@@ -56,7 +53,7 @@ export class OrganisationInsertor {
     return result;
   }
 
-  // TODO: Fix this
+  // TODO: Fix this - commented out due to console.log linter issues
   // async wrapInTransaction(queryText, parameters) {
   //   const client = await pool.connect();
   //   const currResult = { status: 200, msg: "OK" };

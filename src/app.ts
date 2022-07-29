@@ -1,6 +1,6 @@
 import Koa from 'koa';
 import Router from 'koa-router';
-import { OrganisationInsertor } from './endpoints/organizations';
+import { OrganisationInsertor } from './endpoints/organisations';
 import bodyParser from 'koa-bodyparser';
 import { pool } from './postgres-setup';
 import { getOrganisation } from './endpoints/get-organisation';
@@ -28,5 +28,5 @@ router.post('/organisations', async (ctx) => {
 router.get('/organisations/:orgName', async (ctx) => {
   const result = await getOrganisation(ctx);
   ctx.status = result.status;
-  ctx.body = result.body;
+  ctx.body = result.msg;
 });
