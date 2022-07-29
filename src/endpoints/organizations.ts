@@ -16,8 +16,8 @@ export class OrganisationInsertor {
   async processOrganizations(ctx: ParameterizedContext): Promise<Result> {
     const org: OrganisationsBody = ctx.request.body;
 
-    this.result = await this.recursiveOrganisationProcess(org, []);
-    return this.result;
+    const result = await this.recursiveOrganisationProcess(org, []);
+    return result;
   }
 
   async recursiveOrganisationProcess(
@@ -38,21 +38,22 @@ export class OrganisationInsertor {
     if (baseOrg.daughters) {
       for (const daughter of Object.values(baseOrg.daughters)) {
         await this.recursiveOrganisationProcess(daughter, parents);
-
         try {
           await client.query(
             'INSERT INTO organisations_relations(parent, daughter) VALUES ($1,$2);',
             [name, daughter.org_name],
           );
-          return result;
         } catch (err) {
           (result.status = 400),
             (result.msg = `Repeated relations: ${name} and ${daughter.org_name}`);
           this.operationSuccess = false;
+          client.release();
           return result;
         }
       }
     }
+    client.release();
+    return result;
   }
 
   // TODO: Fix this
